@@ -1,0 +1,181 @@
+<?php
+
+/**
+ * The public-facing functionality of the plugin.
+ *
+ * @link       www.cedcommerce.com
+ * @since      1.0.0
+ *
+ * @package    Custom_modification
+ * @subpackage Custom_modification/public
+ */
+
+/**
+ * The public-facing functionality of the plugin.
+ *
+ * Defines the plugin name, version, and two examples hooks for how to
+ * enqueue the public-facing stylesheet and JavaScript.
+ *
+ * @package    Custom_modification
+ * @subpackage Custom_modification/public
+ * @author     Himanshu Arora <himanshuarora@cedcoss.com>
+ */
+class Custom_modification_Public {
+
+	/**
+	 * The ID of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_name    The ID of this plugin.
+	 */
+	private $plugin_name;
+
+	/**
+	 * The version of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $version    The current version of this plugin.
+	 */
+	private $version;
+
+	/**
+	 * Initialize the class and set its properties.
+	 *
+	 * @since    1.0.0
+	 * @param      string    $plugin_name       The name of the plugin.
+	 * @param      string    $version    The version of this plugin.
+	 */
+	public function __construct( $plugin_name, $version ) {
+
+		$this->plugin_name = $plugin_name;
+		$this->version = $version;
+
+	}
+
+	/**
+	 * Register the stylesheets for the public-facing side of the site.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles() {
+
+		/**
+		 * This function is provided for demonstration purposes only.
+		 *
+		 * An instance of this class should be passed to the run() function
+		 * defined in Custom_modification_Loader as all of the hooks are defined
+		 * in that particular class.
+		 *
+		 * The Custom_modification_Loader will then create the relationship
+		 * between the defined hooks and the functions defined in this
+		 * class.
+		 */
+
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/custom_modification-public.css', array(), $this->version, 'all' );
+
+	}
+
+	/**
+	 * Register the JavaScript for the public-facing side of the site.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_scripts() {
+
+		/**
+		 * This function is provided for demonstration purposes only.
+		 *
+		 * An instance of this class should be passed to the run() function
+		 * defined in Custom_modification_Loader as all of the hooks are defined
+		 * in that particular class.
+		 *
+		 * The Custom_modification_Loader will then create the relationship
+		 * between the defined hooks and the functions defined in this
+		 * class.
+		 */
+
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/custom_modification-public.js', array( 'jquery' ), $this->version, false );
+
+	}
+
+	/**
+	 * ced_display_soldout
+	 * 20-01-2021
+	 * Displays sold out on shop page if stock is 0
+	 * @return void
+	 */
+	public function ced_display_soldout() {
+		global $product;
+		$stock = $product->get_stock_quantity();
+		if($stock == 0){
+			echo 'Sold Out';
+		}
+	}
+	
+		
+	/**
+	 * ced_display_soldout_singlepage
+	 * 20-01-2021
+	 * Displays sold out on single page if stock is 0
+	 * @return void
+	 */
+	public function ced_display_soldout_singlepage() {
+		global $product;
+		$stock = $product->get_stock_quantity();
+		if($stock == 0){
+			echo 'Sold Out';
+		}
+	} 
+
+
+
+	
+	/**
+	 * ced_checkout_field_modification
+	 * 20-01-2021
+	 * Changing checkout page fields
+	 * @param  mixed $fields
+	 * @return void
+	 */
+	public function ced_checkout_field_modification($fields){
+		$fields['billing']['billing_email']['label']='Email';
+		$fields['billing']['billing_phone']['label']='Mobile';
+		return $fields;
+
+	}
+	
+
+	public function myplugin_woocommerce_locate_template( $template, $template_name, $template_path ) {
+		global $woocommerce;
+	  
+		$_template = $template;
+	  
+		if ( ! $template_path ) $template_path = $woocommerce->template_url;
+	  
+		$plugin_path  = CED_CUSTOM_MODIFICATION_DIRPATH . '/woocommerce/';
+	  
+		// Look within passed path within the theme - this is priority
+		$template = locate_template(
+	  
+		  array(
+			$template_path . $template_name,
+			$template_name
+		  )
+		);
+	  
+		// Modification: Get the template from this plugin, if it exists
+		if ( ! $template && file_exists( $plugin_path . $template_name ) )
+		  $template = $plugin_path . $template_name;
+	  
+		// Use default template
+		if ( ! $template )
+		  $template = $_template;
+	  
+		// Return what we found
+		return $template;
+	  }
+
+
+}
