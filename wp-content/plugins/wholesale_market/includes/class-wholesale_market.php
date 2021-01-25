@@ -25,16 +25,16 @@
  * @since      1.0.0
  * @package    Wholesale_market
  * @subpackage Wholesale_market/includes
- * @author     Himanshu Arora <himanshuarora@cedcoss.com>
+ * author     Himanshu Arora <himanshuarora@cedcoss.com>
  */
-class Wholesale_market {
+class Wholesale_Market {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   protected
+	 * access   protected
 	 * @var      Wholesale_market_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
@@ -43,7 +43,7 @@ class Wholesale_market {
 	 * The unique identifier of this plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   protected
+	 * access   protected
 	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
 	protected $plugin_name;
@@ -52,7 +52,7 @@ class Wholesale_market {
 	 * The current version of the plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   protected
+	 * access   protected
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
@@ -95,7 +95,7 @@ class Wholesale_market {
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * access   private
 	 */
 	private function load_dependencies() {
 
@@ -133,7 +133,7 @@ class Wholesale_market {
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * access   private
 	 */
 	private function set_locale() {
 
@@ -148,7 +148,7 @@ class Wholesale_market {
 	 * of the plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * access   private
 	 */
 	private function define_admin_hooks() {
 
@@ -157,6 +157,42 @@ class Wholesale_market {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+		// hook for adding new setting tab
+		$this->loader->add_filter( 'woocommerce_settings_tabs_array', $plugin_admin, 'add_settings_tab', 10 );
+
+		// hook for adding subsection in wholesale settings section
+		$this->loader->add_action( 'woocommerce_sections_wholesale', $plugin_admin, 'ced_add_subsection_wholesalemarket' );
+
+		// hook for outputting the checkbox and radio button
+		$this->loader->add_action( 'woocommerce_settings_wholesale', $plugin_admin, 'output' );
+
+		// hook for saving the checkbox and radio button
+		$this->loader->add_action( 'woocommerce_settings_save_wholesale', $plugin_admin, 'save' );
+
+		// hook for adding wholesale price field in products edit
+		$this->loader->add_action( 'woocommerce_product_options_pricing', $plugin_admin, 'ced_add_wholesaleprice_product' );
+
+		// hook to save wholesale price field in db
+		$this->loader->add_action( 'woocommerce_process_product_meta', $plugin_admin, 'ced_save_wholesaleprice_product' );
+
+		// hook to add custom column in user table
+		$this->loader->add_action( 'manage_users_columns', $plugin_admin, 'ced_add_custom_column' );
+
+		// hook to add custom fields in variable product's variation
+		$this->loader->add_action( 'woocommerce_variation_options_pricing', $plugin_admin, 'ced_add_customfields_variable_variation', 10, 3 );
+
+		// hook to save wholesale price and min quantity of variation field in db
+		$this->loader->add_action( 'woocommerce_save_product_variation', $plugin_admin, 'ced_save_wholesaleprice_and_min_quantity_variation', 1, 2 );
+
+		// hook for adding custom checkbox for making user wholesale customer
+		$this->loader->add_action( 'personal_options', $plugin_admin, 'ced_user_edit_checkbox' );
+
+		// hook for adding approve button on wholesale user column
+		$this->loader->add_action( 'manage_users_custom_column', $plugin_admin, 'ced_add_button_wholesale_column', 0, 3 );
+
+		// hook to change customer's role in user table
+		$this->loader->add_action( 'manage_users_extra_tablenav', $plugin_admin, 'ced_change_customer_role_wholesale_column' );
+
 	}
 
 	/**
@@ -164,7 +200,7 @@ class Wholesale_market {
 	 * of the plugin.
 	 *
 	 * @since    1.0.0
-	 * @access   private
+	 * access   private
 	 */
 	private function define_public_hooks() {
 
@@ -172,6 +208,21 @@ class Wholesale_market {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+		// hook to add checkbox on user registration page for wholesale customer option
+		$this->loader->add_action( 'woocommerce_register_form_start', $plugin_public, 'register_form_checkbox' );
+
+		// hook to save register checkbox value
+		$this->loader->add_action( 'woocommerce_created_customer', $plugin_public, 'ced_save_wholesale_checkbox_register' );
+
+		// hook to display wholesale price on shop page
+		$this->loader->add_action( 'woocommerce_after_shop_loop_item', $plugin_public, 'ced_shop_page_display_wholesale' );
+
+		// hook to display wholesale price for all variation
+		$this->loader->add_filter( 'woocommerce_available_variation', $plugin_public, 'ced_display_variation_wholesale', 10, 3 );
+
+		// hook to modify cart price with wholesale price
+		$this->loader->add_filter( 'woocommerce_before_calculate_totals', $plugin_public, 'ced_change_price_to_wholesale' );
 
 	}
 

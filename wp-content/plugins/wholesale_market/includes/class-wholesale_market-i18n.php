@@ -22,9 +22,9 @@
  * @since      1.0.0
  * @package    Wholesale_market
  * @subpackage Wholesale_market/includes
- * @author     Himanshu Arora <himanshuarora@cedcoss.com>
+ * author     Himanshu Arora <himanshuarora@cedcoss.com>
  */
-class Wholesale_market_i18n {
+class Wholesale_Market_I18n {
 
 
 	/**

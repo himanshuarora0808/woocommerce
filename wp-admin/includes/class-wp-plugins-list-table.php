@@ -652,6 +652,7 @@ class WP_Plugins_List_Table extends WP_List_Table {
 			return;
 		}
 
+		
 		echo '<div class="alignleft actions">';
 
 		if ( 'recently_activated' === $status ) {

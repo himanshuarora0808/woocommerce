@@ -192,6 +192,7 @@ if ( ! function_exists( 'storefront_product_columns_wrapper' ) ) {
 	 */
 	function storefront_product_columns_wrapper() {
 		$columns = storefront_loop_columns();
+		
 		echo '<div class="columns-' . absint( $columns ) . '">';
 	}
 }
@@ -205,7 +206,6 @@ if ( ! function_exists( 'storefront_loop_columns' ) ) {
 	 */
 	function storefront_loop_columns() {
 		$columns = 3; // 3 products per row
-
 		if ( function_exists( 'wc_get_default_products_per_row' ) ) {
 			$columns = wc_get_default_products_per_row();
 		}

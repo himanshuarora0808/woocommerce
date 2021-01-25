@@ -1,6 +1,51 @@
 (function( $ ) {
 	'use strict';
 
+	$( document ).ready(
+		function(){
+			$( "[name='radio_buttons']" ).hide();
+
+			$( '#wholesale_checkbox' ).click(
+				function(){
+					if ($( '#wholesale_checkbox' ).prop( 'checked' ) == true) {
+						$( "[name='radio_buttons']" ).show();
+					} else {
+						$( "[name='radio_buttons']" ).hide();
+					}
+				}
+			);
+
+			$( "[name='inventory_radio_buttons']" ).hide();
+
+			$( '#invetory_checkbox' ).click(
+				function(){
+					if ($( '#invetory_checkbox' ).prop( 'checked' ) == true) {
+						$( "[name='inventory_radio_buttons']" ).show();
+					} else {
+						$( "[name='inventory_radio_buttons']" ).hide();
+					}
+				}
+			);
+			$( '#common_min_quantity' ).keyup(
+				function(){
+					var min_quantity = $( '#common_min_quantity' ).val()
+					if (min_quantity < 1) {
+						alert( "Minimum quantity should be greater than 1" );
+					}
+				}
+			);
+			$( '#_wholesale_price' ).mouseleave(
+				function(){
+					var original  = $( '#_regular_price' ).val();
+					var wholesale = $( '#_wholesale_price' ).val();
+					if (original <= wholesale) {
+						alert( 'Wholesale Price cannot be greater than or equal to Regular Price' );
+						$( '#_wholesale_price' ).val( '' );
+					}
+				}
+			);
+		}
+	);
 	/**
 	 * All of the code for your admin-facing JavaScript source
 	 * should reside in this file.
