@@ -111,6 +111,9 @@ class Wholesale_Market_Public {
 		<label>
 			<input  name="wholesaleuser" type="checkbox" id="wholesaleuser" value="wholesale" /> <span><?php esc_html_e( 'Register as a Wholesale Customer', 'woocommerce' ); ?></span>
 		</label>
+		<label>
+			<input type="hidden" id="register_wholesale_nonce" value='<?php echo esc_html( wp_create_nonce( 'register_nonce' ) ); ?>'>
+		</label>
 		<?php
 
 	}
@@ -124,8 +127,11 @@ class Wholesale_Market_Public {
 	 * @return void
 	 */
 	public function ced_save_wholesale_checkbox_register( $user_id ) {
-		$check = isset( $_POST['wholesaleuser'] ) ? 'wholesale' : 'normal';
-		update_user_meta( $user_id, 'Register_wholesale_user', $check );
+		if ( isset( $_POST['register_wholesale_nonce'] ) && wp_verify_nonce( sanitize_text_field( isset( $_POST['register_whoelsale_nonce'] ) ), 'register_nonce' ) ) {
+			$check = isset( $_POST['wholesaleuser'] ) ? 'wholesale' : 'normal';
+			update_user_meta( isset( $user_id ), 'Register_wholesale_user', isset( $check ) );
+		}
+
 	}
 
 

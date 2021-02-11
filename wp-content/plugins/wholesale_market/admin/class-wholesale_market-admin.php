@@ -223,7 +223,12 @@ class Wholesale_Market_Admin {
 					'desc'    => __( 'Enable to apply the wholesale setting', 'my-textdomain' ),
 					'default' => 'no',
 				),
+				array(
+					'id'    => 'general_wholesale_setting',
+					'value' => wp_create_nonce( 'generate_nonce' ),
+					'type'  => 'hidden',
 
+				),
 				array(
 					'type'    => 'radio',
 					'id'      => 'radio_buttons',
@@ -276,7 +281,7 @@ class Wholesale_Market_Admin {
 
 		global $current_section;
 
-		if ( isset( $_POST['common_min_quantity'] ) > 1 ) {
+		if ( isset( $_POST['common_min_quantity'] ) > 1 && isset( $_POST['generate_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['generate_nonce'], 'generate_nonce' ) ) ) {
 			$settings = $this->set_settings( $current_section );
 			WC_Admin_Settings::save_fields( $settings );
 		}
@@ -319,6 +324,15 @@ class Wholesale_Market_Admin {
 			)
 		);
 
+		woocommerce_wp_text_input(
+			array(
+				'id'    => 'simple_wholesale_nonce',
+				'value' => wp_create_nonce( 'simple_nonce' ),
+				'type'  => 'hidden',
+
+			)
+		);
+
 	}
 
 
@@ -332,14 +346,17 @@ class Wholesale_Market_Admin {
 	 */
 	public function ced_save_wholesaleprice_product( $post_id ) {
 		$wholesale_price = isset( $_POST['_wholesale_price'] );
-		if ( ! empty( $wholesale_price ) && $wholesale_price > 1 && $wholesale_price < isset( $_POST['_regular_price'] ) ) {
-			update_post_meta( $post_id, '_wholesale_price', esc_attr( $wholesale_price ) );
+		if ( isset( $_POST['simple_wholesale_nonce'] ) && wp_verify_nonce( sanitize_text_field( $_POST['simple_wholesale_nonce'] ), 'simple_nonce' ) ) {
+			if ( ! empty( $wholesale_price ) && $wholesale_price > 1 && $wholesale_price < isset( $_POST['_regular_price'] ) ) {
+				update_post_meta( $post_id, '_wholesale_price', esc_attr( $wholesale_price ) );
+			}
+
+			$min_quantity = isset( $_POST['_min_quantity'] );
+			if ( ! empty( $min_quantity ) && $min_quantity > 1 ) {
+				update_post_meta( $post_id, '_min_quantity', sanitize_text_field( $min_quantity ) );
+			}
 		}
 
-		$min_quantity = isset( $_POST['_min_quantity'] );
-		if ( ! empty( $min_quantity ) && $min_quantity > 1 ) {
-			update_post_meta( $post_id, '_min_quantity', sanitize_text_field( $min_quantity ) );
-		}
 	}
 
 
@@ -396,6 +413,15 @@ class Wholesale_Market_Admin {
 				)
 			);
 
+			woocommerce_wp_text_input(
+				array(
+					'id'    => 'variable_wholesale_nonce',
+					'value' => wp_create_nonce( 'variable_nonce' ),
+					'type'  => 'hidden',
+
+				)
+			);
+
 	}
 
 
@@ -409,14 +435,23 @@ class Wholesale_Market_Admin {
 	 */
 	public function ced_save_wholesaleprice_and_min_quantity_variation( $variation_id, $i ) {
 		$wholesale_price_variation = isset( $_POST['variable_wholesale_price'][ $i ] );
-		if ( ! empty( $wholesale_price_variation ) && $wholesale_price_variation > 1 ) {
-			update_post_meta( $variation_id, 'variable_wholesale_price', sanitize_text_field( $wholesale_price_variation ) );
+		if ( isset( $_POST['variable_wholesale_nonce'] ) && wp_verify_nonce(
+			sanitize_text_field(
+				$_POST
+				['variable_wholesale_nonce']
+			),
+			'variable_nonce'
+		) ) {
+			if ( ! empty( $wholesale_price_variation ) && $wholesale_price_variation > 1 ) {
+				update_post_meta( $variation_id, 'variable_wholesale_price', sanitize_text_field( $wholesale_price_variation ) );
+			}
+
+			$min_quant_variation = isset( $_POST['variable_min_quantity'][ $i ] );
+			if ( ! empty( $min_quant_variation ) && $min_quant_variation > 1 ) {
+				update_post_meta( $variation_id, 'variable_min_quantity', sanitize_text_field( $min_quant_variation ) );
+			}
 		}
 
-		$min_quant_variation = isset( $_POST['variable_min_quantity'][ $i ] );
-		if ( ! empty( $min_quant_variation ) && $min_quant_variation > 1 ) {
-			update_post_meta( $variation_id, 'variable_min_quantity', sanitize_text_field( $min_quant_variation ) );
-		}
 	}
 
 
